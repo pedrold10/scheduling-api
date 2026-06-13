@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.database import get_db
@@ -18,6 +18,18 @@ async def create_client(data: ClientCreate, db: AsyncSession = Depends(get_db)):
     await db.commit()
     await db.refresh(client)
     return client
+
+
+@router.get("/", response_model=list[ClientOut])
+async def list_clients(
+    phone: str | None = Query(default=None, description="Filtrar por telefone"),
+    db: AsyncSession = Depends(get_db),
+):
+    q = select(Client)
+    if phone:
+        q = q.where(Client.phone == phone)
+    result = await db.execute(q.order_by(Client.name))
+    return result.scalars().all()
 
 
 @router.get("/{client_id}", response_model=ClientOut)

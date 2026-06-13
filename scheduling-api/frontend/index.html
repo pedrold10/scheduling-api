@@ -15,6 +15,7 @@
     --accent: #1a1916; --accent-fg: #f5f4f0;
     --green: #2d6a4f; --green-bg: #e8f5ee;
     --red: #9b2335; --red-bg: #fbeaec;
+    --amber: #8a5a00; --amber-bg: #fef3dc;
     --radius: 14px; --radius-sm: 8px;
     --font: 'DM Sans', sans-serif; --mono: 'DM Mono', monospace;
   }
@@ -22,14 +23,31 @@
 
   .app { max-width: 480px; margin: 0 auto; padding: 0 0 60px; }
 
-  /* header */
+  /* ── header ── */
   .header { padding: 24px 20px 0; position: sticky; top: 0; z-index: 10; background: var(--bg); }
-  .header-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
   .logo { font-size: 20px; font-weight: 500; letter-spacing: -.4px; }
   .logo span { color: var(--text3); font-weight: 300; }
 
-  /* steps indicator */
-  .steps { display: flex; align-items: center; gap: 0; margin-bottom: 20px; }
+  /* ── top tabs ── */
+  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 0; }
+  .tab-btn {
+    flex: 1; padding: 10px 8px; border: none; background: none;
+    font: inherit; font-size: 13px; font-weight: 500; color: var(--text3);
+    cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
+    transition: all .15s; white-space: nowrap;
+  }
+  .tab-btn.active { color: var(--text); border-bottom-color: var(--accent); }
+  .tab-btn:hover:not(.active) { color: var(--text2); }
+
+  /* ── views ── */
+  .view { display: none; animation: up .2s ease; }
+  .view.active { display: block; }
+  @keyframes up { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ── steps ── */
+  .steps-wrap { padding: 16px 20px 0; }
+  .steps { display: flex; align-items: center; margin-bottom: 4px; }
   .step-item { display: flex; align-items: center; gap: 6px; }
   .step-dot {
     width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--border);
@@ -38,22 +56,23 @@
     background: var(--surface); flex-shrink: 0; transition: all .2s;
   }
   .step-dot.active { border-color: var(--accent); background: var(--accent); color: var(--accent-fg); }
-  .step-dot.done { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+  .step-dot.done   { border-color: var(--green);  background: var(--green-bg);  color: var(--green); }
   .step-label { font-size: 12px; color: var(--text3); }
   .step-label.active { color: var(--text); font-weight: 500; }
-  .step-sep { flex: 1; height: 1px; background: var(--border); margin: 0 6px; min-width: 12px; }
+  .step-sep { flex: 1; height: 1px; background: var(--border); margin: 0 6px; min-width: 10px; }
 
-  /* sections */
-  .step-section { display: none; padding: 4px 20px 0; animation: up .2s ease; }
+  /* ── step sections ── */
+  .step-section { display: none; padding: 12px 20px 0; animation: up .2s ease; }
   .step-section.active { display: block; }
-  @keyframes up { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
   .section-title { font-size: 13px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 12px; }
 
-  /* card */
+  /* ── card ── */
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; }
+  .card-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .card-value { font-size: 15px; font-weight: 500; }
+  .card-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
 
-  /* form */
+  /* ── form ── */
   .form-group { margin-bottom: 14px; }
   .form-group label { display: block; font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 5px; letter-spacing: .2px; }
   .form-group input,
@@ -71,7 +90,7 @@
   .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
   .form-group textarea { resize: vertical; min-height: 72px; }
 
-  /* slots */
+  /* ── slots ── */
   .date-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
   .date-nav-label { font-size: 14px; font-weight: 500; text-align: center; }
   .slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 4px; }
@@ -83,41 +102,46 @@
   .slot-btn:hover  { border-color: var(--accent); color: var(--accent); }
   .slot-btn.chosen { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
 
-  /* summary chip */
-  .summary-bar {
-    display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px;
-  }
-  .chip {
-    display: inline-flex; align-items: center; gap: 4px;
-    font-size: 12px; padding: 4px 10px; border-radius: 99px;
-    background: var(--surface); border: 1px solid var(--border); color: var(--text2);
-  }
+  /* ── summary chips ── */
+  .summary-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 4px 10px; border-radius: 99px; background: var(--surface); border: 1px solid var(--border); color: var(--text2); }
   .chip strong { color: var(--text); font-weight: 500; }
 
-  /* buttons */
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-    padding: 11px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border);
-    background: var(--surface); font: inherit; font-size: 14px; font-weight: 500;
-    color: var(--text); cursor: pointer; transition: all .15s;
-  }
+  /* ── badge ── */
+  .badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 99px; }
+  .badge-green  { background: var(--green-bg);  color: var(--green); }
+  .badge-red    { background: var(--red-bg);    color: var(--red); }
+  .badge-amber  { background: var(--amber-bg);  color: var(--amber); }
+  .badge-gray   { background: var(--surface2);  color: var(--text2); }
+
+  /* ── buttons ── */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 11px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); font: inherit; font-size: 14px; font-weight: 500; color: var(--text); cursor: pointer; transition: all .15s; }
   .btn:hover { border-color: var(--border2); background: var(--surface2); }
   .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); width: 100%; }
   .btn-primary:hover { opacity: .85; }
   .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 6px; }
   .btn-outline { border-color: var(--border2); }
+  .btn-danger { border-color: var(--red); color: var(--red); }
+  .btn-danger:hover { background: var(--red-bg); }
 
-  /* success */
+  /* ── success ── */
   .success-screen { text-align: center; padding: 40px 20px; }
   .success-icon { font-size: 48px; margin-bottom: 16px; }
   .success-title { font-size: 20px; font-weight: 500; margin-bottom: 8px; }
   .success-sub { font-size: 14px; color: var(--text2); margin-bottom: 24px; }
   .success-detail { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; text-align: left; margin-bottom: 20px; }
-  .success-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
-  .success-row:last-child { border: none; }
-  .success-row span:first-child { color: var(--text2); }
+  .detail-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .detail-row:last-child { border: none; }
+  .detail-row span:first-child { color: var(--text2); }
 
-  /* misc */
+  /* ── meus agendamentos ── */
+  .lookup-wrap { padding: 20px 20px 0; }
+  .lookup-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+  .lookup-row { display: flex; gap: 8px; align-items: flex-end; }
+  .lookup-row .form-group { flex: 1; margin-bottom: 0; }
+  .my-appt-list { padding: 0 20px; }
+
+  /* ── misc ── */
   .empty { text-align: center; padding: 36px 20px; color: var(--text3); font-size: 14px; }
   .empty-icon { font-size: 28px; margin-bottom: 8px; }
   .spinner { width: 20px; height: 20px; border: 2px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; margin: 32px auto; }
@@ -135,108 +159,150 @@
     <div class="header-top">
       <div class="logo">agenda<span>.app</span></div>
     </div>
-    <div class="steps" id="steps-indicator">
-      <div class="step-item">
-        <div class="step-dot active" id="dot-1">1</div>
-        <span class="step-label active" id="lbl-1">Local</span>
-      </div>
-      <div class="step-sep"></div>
-      <div class="step-item">
-        <div class="step-dot" id="dot-2">2</div>
-        <span class="step-label" id="lbl-2">Horário</span>
-      </div>
-      <div class="step-sep"></div>
-      <div class="step-item">
-        <div class="step-dot" id="dot-3">3</div>
-        <span class="step-label" id="lbl-3">Seus dados</span>
-      </div>
-      <div class="step-sep"></div>
-      <div class="step-item">
-        <div class="step-dot" id="dot-4">4</div>
-        <span class="step-label" id="lbl-4">Confirmação</span>
-      </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('agendar', this)">Agendar</button>
+      <button class="tab-btn" onclick="switchTab('meus', this)">Meus agendamentos</button>
     </div>
   </header>
 
-  <!-- step 1: local + serviço + funcionário -->
-  <section class="step-section active" id="step-1">
-    <p class="section-title">Onde e o quê</p>
-    <div class="card">
-      <div class="form-group">
-        <label>Estabelecimento</label>
-        <select id="ag-establishment" onchange="onEstablishmentChange()">
-          <option value="">Selecione...</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Serviço</label>
-        <select id="ag-service" disabled onchange="onServiceChange()">
-          <option value="">Selecione...</option>
-        </select>
-      </div>
-      <div class="form-group" style="margin-bottom:0">
-        <label>Profissional</label>
-        <select id="ag-employee" disabled>
-          <option value="">Selecione...</option>
-        </select>
-      </div>
-    </div>
-    <button class="btn btn-primary" onclick="goStep2()">Escolher horário →</button>
-  </section>
+  <!-- ══════════════════════════════════════
+       VIEW: AGENDAR
+  ══════════════════════════════════════ -->
+  <div class="view active" id="view-agendar">
 
-  <!-- step 2: data + slot -->
-  <section class="step-section" id="step-2">
-    <div class="summary-bar" id="summary-1"></div>
-    <div class="date-nav">
-      <button class="btn btn-sm" onclick="changeDay(-1)">← anterior</button>
-      <span class="date-nav-label" id="slots-date-label"></span>
-      <button class="btn btn-sm" onclick="changeDay(1)">próximo →</button>
+    <div class="steps-wrap">
+      <div class="steps">
+        <div class="step-item">
+          <div class="step-dot active" id="dot-1">1</div>
+          <span class="step-label active" id="lbl-1">Local</span>
+        </div>
+        <div class="step-sep"></div>
+        <div class="step-item">
+          <div class="step-dot" id="dot-2">2</div>
+          <span class="step-label" id="lbl-2">Horário</span>
+        </div>
+        <div class="step-sep"></div>
+        <div class="step-item">
+          <div class="step-dot" id="dot-3">3</div>
+          <span class="step-label" id="lbl-3">Seus dados</span>
+        </div>
+        <div class="step-sep"></div>
+        <div class="step-item">
+          <div class="step-dot" id="dot-4">4</div>
+          <span class="step-label" id="lbl-4">Confirmação</span>
+        </div>
+      </div>
     </div>
-    <div id="slots-container"></div>
-    <div style="margin-top:12px;display:flex;gap:8px">
-      <button class="btn btn-sm btn-outline" onclick="goStep(1)" style="flex:1">← voltar</button>
-      <button class="btn btn-sm btn-primary" onclick="goStep3()" style="flex:2">Continuar →</button>
-    </div>
-  </section>
 
-  <!-- step 3: dados do cliente -->
-  <section class="step-section" id="step-3">
-    <div class="summary-bar" id="summary-2"></div>
-    <p class="section-title">Seus dados</p>
-    <div class="card">
-      <div class="form-group">
-        <label>Nome completo</label>
-        <input type="text" id="cl-name" placeholder="Como você se chama?">
+    <!-- step 1 -->
+    <section class="step-section active" id="step-1">
+      <p class="section-title">Onde e o quê</p>
+      <div class="card">
+        <div class="form-group">
+          <label>Estabelecimento</label>
+          <select id="ag-establishment" onchange="onEstablishmentChange()">
+            <option value="">Selecione...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Serviço</label>
+          <select id="ag-service" disabled onchange="onServiceChange()">
+            <option value="">Selecione...</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>Profissional</label>
+          <select id="ag-employee" disabled>
+            <option value="">Selecione...</option>
+          </select>
+        </div>
       </div>
-      <div class="form-group">
-        <label>Telefone</label>
-        <input type="tel" id="cl-phone" placeholder="(83) 99999-9999">
-      </div>
-      <div class="form-group">
-        <label>E-mail (opcional)</label>
-        <input type="email" id="cl-email" placeholder="para receber confirmação">
-      </div>
-      <div class="form-group" style="margin-bottom:0">
-        <label>Observações (opcional)</label>
-        <textarea id="ag-notes" placeholder="Ex: cabelo curto, alergia a produto..."></textarea>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;margin-top:4px">
-      <button class="btn btn-sm btn-outline" onclick="goStep(2)" style="flex:1">← voltar</button>
-      <button class="btn btn-sm btn-primary" onclick="confirmBooking()" style="flex:2">Confirmar agendamento</button>
-    </div>
-  </section>
+      <button class="btn btn-primary" onclick="goStep2()">Escolher horário →</button>
+    </section>
 
-  <!-- step 4: sucesso -->
-  <section class="step-section" id="step-4">
-    <div class="success-screen">
-      <div class="success-icon">✅</div>
-      <div class="success-title">Agendamento confirmado!</div>
-      <div class="success-sub">Te esperamos no horário abaixo.</div>
-      <div class="success-detail" id="success-detail"></div>
-      <button class="btn btn-primary" onclick="resetFlow()">Fazer novo agendamento</button>
+    <!-- step 2 -->
+    <section class="step-section" id="step-2">
+      <div class="summary-bar" id="summary-1"></div>
+      <div class="date-nav">
+        <button class="btn btn-sm" onclick="changeDay(-1)">← anterior</button>
+        <span class="date-nav-label" id="slots-date-label"></span>
+        <button class="btn btn-sm" onclick="changeDay(1)">próximo →</button>
+      </div>
+      <div id="slots-container"></div>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="btn btn-sm btn-outline" onclick="goStep(1)" style="flex:1">← voltar</button>
+        <button class="btn btn-sm btn-primary" onclick="goStep3()" style="flex:2">Continuar →</button>
+      </div>
+    </section>
+
+    <!-- step 3 -->
+    <section class="step-section" id="step-3">
+      <div class="summary-bar" id="summary-2"></div>
+      <p class="section-title">Seus dados</p>
+      <div class="card">
+        <div class="form-group">
+          <label>Nome completo</label>
+          <input type="text" id="cl-name" placeholder="Como você se chama?">
+        </div>
+        <div class="form-group">
+          <label>Telefone</label>
+          <input type="tel" id="cl-phone" placeholder="(83) 99999-9999">
+        </div>
+        <div class="form-group">
+          <label>E-mail (opcional)</label>
+          <input type="email" id="cl-email" placeholder="para receber confirmação">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label>Observações (opcional)</label>
+          <textarea id="ag-notes" placeholder="Ex: cabelo curto, alergia a produto..."></textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button class="btn btn-sm btn-outline" onclick="goStep(2)" style="flex:1">← voltar</button>
+        <button class="btn btn-sm btn-primary" onclick="confirmBooking()" style="flex:2">Confirmar agendamento</button>
+      </div>
+    </section>
+
+    <!-- step 4: sucesso -->
+    <section class="step-section" id="step-4">
+      <div class="success-screen">
+        <div class="success-icon">✅</div>
+        <div class="success-title">Agendamento confirmado!</div>
+        <div class="success-sub">Te esperamos no horário abaixo.</div>
+        <div class="success-detail" id="success-detail"></div>
+        <button class="btn btn-primary" onclick="resetFlow()" style="margin-bottom:10px">Fazer novo agendamento</button>
+        <button class="btn" style="width:100%" onclick="switchTab('meus', document.querySelectorAll('.tab-btn')[1])">Ver meus agendamentos</button>
+      </div>
+    </section>
+
+  </div><!-- /view-agendar -->
+
+
+  <!-- ══════════════════════════════════════
+       VIEW: MEUS AGENDAMENTOS
+  ══════════════════════════════════════ -->
+  <div class="view" id="view-meus">
+
+    <div class="lookup-wrap">
+      <div class="lookup-box">
+        <p class="section-title" style="margin-bottom:10px">Buscar pelo telefone</p>
+        <div class="lookup-row">
+          <div class="form-group">
+            <input type="tel" id="lookup-phone" placeholder="(83) 99999-9999" onkeydown="if(event.key==='Enter') lookupAppointments()">
+          </div>
+          <button class="btn btn-primary" style="width:auto;flex-shrink:0;margin-bottom:0" onclick="lookupAppointments()">Buscar</button>
+        </div>
+      </div>
     </div>
-  </section>
+
+    <div class="my-appt-list" id="my-appt-list">
+      <div class="empty">
+        <div class="empty-icon">🔍</div>
+        Digite seu telefone para ver os agendamentos.
+      </div>
+    </div>
+
+  </div><!-- /view-meus -->
 
 </div>
 
@@ -244,21 +310,34 @@
 
 <script>
 const API = 'http://localhost:8000';
-let state = { estId: null, estName: '', svcId: null, svcName: '', svcDuration: 0, svcPrice: 0, empId: null, empName: '', slotId: null, slotDate: new Date(), slotTime: '' };
+let state = { estId:null, estName:'', svcId:null, svcName:'', svcDuration:0, svcPrice:0, empId:null, empName:'', slotId:null, slotDate:new Date(), slotTime:'' };
+let lastPhone = '';
 
+/* ── helpers ── */
 async function api(method, path, body) {
   try {
-    const r = await fetch(API + path, { method, headers: { 'Content-Type': 'application/json' }, body: body ? JSON.stringify(body) : undefined });
-    if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.detail || 'Erro ' + r.status); }
+    const r = await fetch(API + path, { method, headers:{'Content-Type':'application/json'}, body: body ? JSON.stringify(body) : undefined });
+    if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e.detail || 'Erro '+r.status); }
     if (r.status === 204) return null;
     return r.json();
   } catch(e) { toast(e.message, true); throw e; }
 }
 function toast(msg, err=false) {
   const t = document.getElementById('toast');
-  t.textContent = msg; t.className = 'toast show' + (err ? ' error' : '');
-  setTimeout(() => t.className = 'toast', 2800);
+  t.textContent = msg; t.className = 'toast show'+(err?' error':'');
+  setTimeout(() => t.className='toast', 2800);
 }
+
+/* ── tabs ── */
+function switchTab(name, btn) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'meus' && lastPhone) lookupAppointments();
+}
+
+/* ── booking steps ── */
 function goStep(n) {
   document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
   document.getElementById('step-' + n).classList.add('active');
@@ -272,7 +351,6 @@ function goStep(n) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-/* step 1 */
 async function onEstablishmentChange() {
   const sel = document.getElementById('ag-establishment');
   state.estId = sel.value;
@@ -284,43 +362,38 @@ async function onEstablishmentChange() {
   svcSel.disabled = !state.estId; empSel.disabled = true;
   if (!state.estId) return;
   const [emps, svcs] = await Promise.all([
-    api('GET', `/employees/?establishment_id=${state.estId}`).catch(() => []),
-    api('GET', `/services/?establishment_id=${state.estId}`).catch(() => []),
+    api('GET', `/employees/?establishment_id=${state.estId}`).catch(()=>[]),
+    api('GET', `/services/?establishment_id=${state.estId}`).catch(()=>[]),
   ]);
-  (svcs || []).filter(s => s.active).forEach(s => svcSel.appendChild(new Option(`${s.name}`, s.id, false, false)));
+  (svcs||[]).filter(s=>s.active).forEach(s => svcSel.appendChild(new Option(s.name, s.id)));
   svcSel._data = svcs || [];
-  (emps || []).filter(e => e.active).forEach(e => empSel.appendChild(new Option(e.name, e.id)));
-  empSel._data = emps || [];
+  (emps||[]).filter(e=>e.active).forEach(e => empSel.appendChild(new Option(e.name, e.id)));
+  svcSel.disabled = false;
 }
 
 function onServiceChange() {
   const sel = document.getElementById('ag-service');
   state.svcId = sel.value;
-  const found = (sel._data || []).find(s => s.id === state.svcId);
+  const found = (sel._data||[]).find(s => s.id === state.svcId);
   state.svcName = found?.name || ''; state.svcDuration = found?.duration_minutes || 0; state.svcPrice = found?.price || 0;
   document.getElementById('ag-employee').disabled = !state.svcId;
 }
 
 async function goStep2() {
-  state.empId = document.getElementById('ag-employee').value;
   const empSel = document.getElementById('ag-employee');
+  state.empId = empSel.value;
   state.empName = empSel.options[empSel.selectedIndex]?.text || '';
   if (!state.estId) return toast('Selecione o estabelecimento.', true);
   if (!state.svcId) return toast('Selecione o serviço.', true);
   if (!state.empId) return toast('Selecione o profissional.', true);
   state.slotDate = new Date();
   renderSummary('summary-1');
-  goStep(2);
-  loadSlots();
+  goStep(2); loadSlots();
 }
 
-/* step 2 */
 function renderSummary(id) {
-  const el = document.getElementById(id);
-  const dateStr = state.slotTime
-    ? `${state.slotDate.toLocaleDateString('pt-BR', { day:'2-digit', month:'short' })} · ${state.slotTime}`
-    : '';
-  el.innerHTML = [
+  const dateStr = state.slotTime ? `${state.slotDate.toLocaleDateString('pt-BR',{day:'2-digit',month:'short'})} · ${state.slotTime}` : '';
+  document.getElementById(id).innerHTML = [
     state.estName && `<span class="chip"><strong>${state.estName}</strong></span>`,
     state.svcName && `<span class="chip"><strong>${state.svcName}</strong> · R$ ${parseFloat(state.svcPrice).toFixed(2)}</span>`,
     state.empName && `<span class="chip">${state.empName}</span>`,
@@ -329,10 +402,8 @@ function renderSummary(id) {
 }
 
 function changeDay(d) {
-  const next = new Date(state.slotDate);
-  next.setDate(next.getDate() + d);
-  state.slotDate = next;
-  state.slotId = null; state.slotTime = '';
+  const next = new Date(state.slotDate); next.setDate(next.getDate() + d);
+  state.slotDate = next; state.slotId = null; state.slotTime = '';
   document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('chosen'));
   loadSlots();
 }
@@ -341,9 +412,9 @@ async function loadSlots() {
   const container = document.getElementById('slots-container');
   const label = document.getElementById('slots-date-label');
   container.innerHTML = '<div class="spinner"></div>';
-  const dateStr = state.slotDate.toISOString().slice(0, 10);
-  label.textContent = state.slotDate.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'short' });
-  const slots = await api('GET', `/availability/?employee_id=${state.empId}&from_date=${dateStr}&to_date=${dateStr}`).catch(() => []);
+  const dateStr = state.slotDate.toISOString().slice(0,10);
+  label.textContent = state.slotDate.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'short'});
+  const slots = await api('GET', `/availability/?employee_id=${state.empId}&from_date=${dateStr}&to_date=${dateStr}`).catch(()=>[]);
   if (!slots || slots.length === 0) {
     container.innerHTML = '<div class="empty"><div class="empty-icon">📅</div>Sem horários disponíveis neste dia.</div>';
     return;
@@ -352,19 +423,17 @@ async function loadSlots() {
   const grid = container.querySelector('.slots-grid');
   slots.forEach(slot => {
     const btn = document.createElement('button');
-    btn.className = 'slot-btn'; btn.textContent = slot.start_time.slice(0, 5); btn.dataset.id = slot.id;
-    btn.onclick = () => { document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('chosen')); btn.classList.add('chosen'); state.slotId = slot.id; state.slotTime = slot.start_time.slice(0,5); };
+    btn.className = 'slot-btn'; btn.textContent = slot.start_time.slice(0,5); btn.dataset.id = slot.id;
+    btn.onclick = () => { document.querySelectorAll('.slot-btn').forEach(b=>b.classList.remove('chosen')); btn.classList.add('chosen'); state.slotId = slot.id; state.slotTime = slot.start_time.slice(0,5); };
     grid.appendChild(btn);
   });
 }
 
 function goStep3() {
   if (!state.slotId) return toast('Selecione um horário.', true);
-  renderSummary('summary-2');
-  goStep(3);
+  renderSummary('summary-2'); goStep(3);
 }
 
-/* step 3 */
 async function confirmBooking() {
   const name  = document.getElementById('cl-name').value.trim();
   const phone = document.getElementById('cl-phone').value.trim();
@@ -372,30 +441,92 @@ async function confirmBooking() {
   const notes = document.getElementById('ag-notes').value.trim();
   if (!name || !phone) return toast('Nome e telefone são obrigatórios.', true);
   let client;
-  try { client = await api('POST', '/clients/', { name, phone, email: email || null }); }
-  catch { const all = await api('GET', '/clients/').catch(() => []); client = (all||[]).find(c => c.phone === phone); if (!client) return; }
-  const appt = await api('POST', '/appointments/', { slot_id: state.slotId, client_id: client.id, service_id: state.svcId, notes: notes || null });
+  try { client = await api('POST', '/clients/', { name, phone, email: email||null }); }
+  catch { const all = await api('GET', '/clients/').catch(()=>[]); client = (all||[]).find(c=>c.phone===phone); if (!client) return; }
+  const appt = await api('POST', '/appointments/', { slot_id: state.slotId, client_id: client.id, service_id: state.svcId, notes: notes||null });
   if (!appt) return;
+  lastPhone = phone;
   document.getElementById('success-detail').innerHTML = [
     ['Local', state.estName], ['Serviço', state.svcName],
     ['Profissional', state.empName],
-    ['Data', state.slotDate.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })],
+    ['Data', state.slotDate.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'long'})],
     ['Horário', state.slotTime],
     ['Valor', `R$ ${parseFloat(state.svcPrice).toFixed(2)}`],
-  ].map(([k,v]) => `<div class="success-row"><span>${k}</span><span>${v}</span></div>`).join('');
+  ].map(([k,v]) => `<div class="detail-row"><span>${k}</span><span>${v}</span></div>`).join('');
   goStep(4);
 }
 
 function resetFlow() {
-  state = { estId: null, estName: '', svcId: null, svcName: '', svcDuration: 0, svcPrice: 0, empId: null, empName: '', slotId: null, slotDate: new Date(), slotTime: '' };
-  ['ag-establishment','ag-service','ag-employee'].forEach(id => { const s = document.getElementById(id); s.value = ''; s.disabled = id !== 'ag-establishment'; });
-  ['cl-name','cl-phone','cl-email','ag-notes'].forEach(id => document.getElementById(id).value = '');
+  state = { estId:null, estName:'', svcId:null, svcName:'', svcDuration:0, svcPrice:0, empId:null, empName:'', slotId:null, slotDate:new Date(), slotTime:'' };
+  ['ag-establishment','ag-service','ag-employee'].forEach(id => { const s=document.getElementById(id); s.value=''; s.disabled=id!=='ag-establishment'; });
+  ['cl-name','cl-phone','cl-email','ag-notes'].forEach(id => document.getElementById(id).value='');
   goStep(1);
 }
 
-/* init */
+/* ── meus agendamentos ── */
+async function lookupAppointments() {
+  const phone = document.getElementById('lookup-phone').value.trim();
+  if (!phone) return toast('Digite seu telefone.', true);
+  lastPhone = phone;
+
+  const el = document.getElementById('my-appt-list');
+  el.innerHTML = '<div class="spinner"></div>';
+
+  // busca o cliente pelo telefone
+  const clients = await api('GET', `/clients/?phone=${encodeURIComponent(phone)}`).catch(()=>[]);
+  const client = (clients||[]).find(c => c.phone === phone);
+
+  if (!client) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div>Nenhum cadastro encontrado para este telefone.</div>';
+    return;
+  }
+
+  const data = await api('GET', `/appointments/?client_id=${client.id}`).catch(()=>[]);
+
+  if (!data || data.length === 0) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🗓</div>Nenhum agendamento encontrado.</div>';
+    return;
+  }
+
+  const statusMap = {
+    confirmed: ['badge-green', 'Confirmado'],
+    pending:   ['badge-amber', 'Pendente'],
+    cancelled: ['badge-red',   'Cancelado'],
+    completed: ['badge-gray',  'Concluído'],
+  };
+
+  el.innerHTML = `<p style="font-size:13px;color:var(--text3);margin-bottom:10px">Olá, <strong style="color:var(--text)">${client.name}</strong> — ${data.length} agendamento(s)</p>` +
+    data.map(a => {
+      const [cls, lbl] = statusMap[a.status] || ['badge-gray', a.status];
+      const dateStr = a.slot_date
+        ? new Date(a.slot_date + 'T00:00').toLocaleDateString('pt-BR', { weekday:'short', day:'2-digit', month:'short' })
+        : '—';
+      const timeStr = a.start_time ? a.start_time.slice(0,5) : '';
+      const canCancel = a.status === 'confirmed' || a.status === 'pending';
+      return `
+        <div class="card">
+          <div class="card-row" style="margin-bottom:${canCancel?'10':'0'}px">
+            <div>
+              <div class="card-value">${dateStr}${timeStr ? ' · ' + timeStr : ''}</div>
+              <div class="card-sub">${a.status === 'cancelled' ? 'Cancelado' : ''}</div>
+            </div>
+            <span class="badge ${cls}">${lbl}</span>
+          </div>
+          ${canCancel ? `<button class="btn btn-sm btn-danger" onclick="clientCancel('${a.id}')">Cancelar agendamento</button>` : ''}
+        </div>`;
+    }).join('');
+}
+
+async function clientCancel(id) {
+  if (!confirm('Tem certeza que deseja cancelar este agendamento?')) return;
+  await api('PATCH', `/appointments/${id}/cancel`);
+  toast('Agendamento cancelado.');
+  lookupAppointments();
+}
+
+/* ── init ── */
 (async () => {
-  const data = await api('GET', '/establishments/').catch(() => []);
+  const data = await api('GET', '/establishments/').catch(()=>[]);
   const sel = document.getElementById('ag-establishment');
   (data||[]).forEach(e => sel.appendChild(new Option(e.name, e.id)));
 })();
