@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meus agendamentos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f4f0; --surface: #ffffff; --surface2: #f0efe9;
+    --border: #e2e0d8; --border2: #c8c6bc;
+    --text: #1a1916; --text2: #6b6960; --text3: #9b9990;
+    --accent: #1a1916; --accent-fg: #f5f4f0;
+    --green: #2d6a4f; --green-bg: #e8f5ee;
+    --red: #9b2335; --red-bg: #fbeaec;
+    --amber: #8a5a00; --amber-bg: #fef3dc;
+    --radius: 14px; --radius-sm: 8px;
+    --font: 'DM Sans', sans-serif; --mono: 'DM Mono', monospace;
+  }
+  body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 15px; line-height: 1.5; }
+  .app { max-width: 480px; margin: 0 auto; padding: 0 0 60px; }
+
+  /* header */
+  .header { padding: 24px 20px 16px; position: sticky; top: 0; z-index: 10; background: var(--bg); }
+  .header-row { display: flex; align-items: center; gap: 10px; }
+  .back-btn {
+    width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--border);
+    background: var(--surface); display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; transition: all .15s; font-size: 16px; color: var(--text);
+  }
+  .back-btn:hover { border-color: var(--border2); background: var(--surface2); }
+  .header-title { font-size: 18px; font-weight: 500; letter-spacing: -.3px; }
+
+  /* views */
+  .view { display: none; animation: up .2s ease; }
+  .view.active { display: block; }
+  @keyframes up { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* lookup */
+  .lookup-wrap { padding: 0 20px; }
+  .lookup-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
+  .lookup-row { display: flex; gap: 8px; align-items: flex-end; }
+  .form-group { margin-bottom: 0; flex: 1; }
+  .form-group label { display: block; font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 5px; }
+  .form-group input {
+    width: 100%; padding: 10px 12px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: var(--surface);
+    font: inherit; font-size: 14px; color: var(--text); outline: none; transition: border-color .15s;
+  }
+  .form-group input:focus { border-color: var(--accent); }
+
+  .section-title { font-size: 13px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: .6px; margin: 0 20px 12px; }
+
+  /* list */
+  .list-wrap { padding: 0 20px; }
+  .list-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; margin-bottom: 10px; cursor: pointer; transition: all .15s;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .list-card:hover { border-color: var(--border2); }
+  .list-card-main { min-width: 0; }
+  .list-card-date { font-size: 15px; font-weight: 500; }
+  .list-card-sub { font-size: 13px; color: var(--text2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .list-card-chevron { color: var(--text3); font-size: 18px; flex-shrink: 0; }
+
+  /* badge */
+  .badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 99px; flex-shrink: 0; }
+  .badge-green  { background: var(--green-bg);  color: var(--green); }
+  .badge-red    { background: var(--red-bg);    color: var(--red); }
+  .badge-amber  { background: var(--amber-bg);  color: var(--amber); }
+  .badge-gray   { background: var(--surface2);  color: var(--text2); }
+
+  /* detail */
+  .detail-wrap { padding: 0 20px; }
+  .detail-hero { text-align: center; padding: 8px 0 24px; }
+  .detail-hero-icon { font-size: 40px; margin-bottom: 12px; }
+  .detail-hero-date { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+  .detail-hero-time { font-size: 28px; font-weight: 500; letter-spacing: -.5px; }
+  .detail-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 16px; margin-bottom: 16px; }
+  .detail-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14px; }
+  .detail-row:last-child { border: none; }
+  .detail-row span:first-child { color: var(--text2); }
+  .detail-row span:last-child { font-weight: 500; text-align: right; }
+
+  /* buttons */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 11px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); font: inherit; font-size: 14px; font-weight: 500; color: var(--text); cursor: pointer; transition: all .15s; width: 100%; }
+  .btn:hover { border-color: var(--border2); background: var(--surface2); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+  .btn-primary:hover { opacity: .85; }
+  .btn-danger { border-color: var(--red); color: var(--red); }
+  .btn-danger:hover { background: var(--red-bg); }
+
+  /* misc */
+  .empty { text-align: center; padding: 48px 20px; color: var(--text3); font-size: 14px; }
+  .empty-icon { font-size: 32px; margin-bottom: 10px; }
+  .spinner { width: 20px; height: 20px; border: 2px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; margin: 40px auto; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--accent-fg); padding: 10px 18px; border-radius: 99px; font-size: 13px; font-weight: 500; z-index: 999; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .toast.show { opacity: 1; }
+  .toast.error { background: var(--red); }
+  .greeting { font-size: 13px; color: var(--text3); padding: 0 20px 12px; }
+  .greeting strong { color: var(--text); }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="header">
+    <div class="header-row" id="header-row">
+      <a href="index.html" class="back-btn">←</a>
+      <div class="header-title">Meus agendamentos</div>
+    </div>
+  </header>
+
+  <!-- ══ VIEW: BUSCA / LISTA ══ -->
+  <div class="view active" id="view-list">
+    <div class="lookup-wrap">
+      <div class="lookup-box">
+        <p class="section-title" style="margin:0 0 10px">Buscar pelo telefone</p>
+        <div class="lookup-row">
+          <div class="form-group">
+            <input type="tel" id="lookup-phone" placeholder="(83) 99999-9999" onkeydown="if(event.key==='Enter') lookupAppointments()">
+          </div>
+          <button class="btn btn-primary" style="width:auto;flex-shrink:0" onclick="lookupAppointments()">Buscar</button>
+        </div>
+      </div>
+    </div>
+    <div id="greeting"></div>
+    <div class="list-wrap" id="appt-list">
+      <div class="empty">
+        <div class="empty-icon">🔍</div>
+        Digite seu telefone para ver os agendamentos.
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ VIEW: DETALHE ══ -->
+  <div class="view" id="view-detail">
+    <div class="detail-wrap" id="detail-content"></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'http://localhost:8000';
+let appointments = [];
+let lastPhone = '';
+
+async function api(method, path, body) {
+  try {
+    const r = await fetch(API + path, { method, headers:{'Content-Type':'application/json'}, body: body ? JSON.stringify(body) : undefined });
+    if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e.detail || 'Erro '+r.status); }
+    if (r.status === 204) return null;
+    return r.json();
+  } catch(e) { toast(e.message, true); throw e; }
+}
+function toast(msg, err=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show'+(err?' error':'');
+  setTimeout(() => t.className='toast', 2800);
+}
+
+const statusMap = {
+  confirmed: ['badge-green', 'Confirmado'],
+  pending:   ['badge-amber', 'Pendente'],
+  cancelled: ['badge-red',   'Cancelado'],
+  completed: ['badge-gray',  'Concluído'],
+};
+
+function showView(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function lookupAppointments() {
+  const phone = document.getElementById('lookup-phone').value.trim();
+  if (!phone) return toast('Digite seu telefone.', true);
+  lastPhone = phone;
+
+  const listEl = document.getElementById('appt-list');
+  const greetEl = document.getElementById('greeting');
+  listEl.innerHTML = '<div class="spinner"></div>';
+  greetEl.innerHTML = '';
+
+  const clients = await api('GET', `/clients?phone=${encodeURIComponent(phone)}`).catch(()=>[]);
+  const client = (clients||[])[0];
+
+  if (!client) {
+    listEl.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div>Nenhum cadastro encontrado para este telefone.</div>';
+    return;
+  }
+
+  appointments = await api('GET', `/appointments?client_id=${client.id}`).catch(()=>[]);
+
+  if (!appointments || appointments.length === 0) {
+    greetEl.innerHTML = `<p class="greeting">Olá, <strong>${client.name}</strong></p>`;
+    listEl.innerHTML = '<div class="empty"><div class="empty-icon">🗓</div>Nenhum agendamento encontrado.</div>';
+    return;
+  }
+
+  greetEl.innerHTML = `<p class="greeting">Olá, <strong>${client.name}</strong> — ${appointments.length} agendamento(s)</p>`;
+
+  listEl.innerHTML = appointments.map((a, i) => {
+    const [cls, lbl] = statusMap[a.status] || ['badge-gray', a.status];
+    const dateStr = a.slot_date
+      ? new Date(a.slot_date + 'T00:00').toLocaleDateString('pt-BR', { weekday:'short', day:'2-digit', month:'short' })
+      : '—';
+    const timeStr = a.start_time ? a.start_time.slice(0,5) : '';
+    return `
+      <div class="list-card" onclick="openDetail(${i})">
+        <div class="list-card-main">
+          <div class="list-card-date">${dateStr}${timeStr ? ' · ' + timeStr : ''}</div>
+          <div class="list-card-sub">${a.service_name || 'Serviço'}${a.employee_name ? ' · ' + a.employee_name : ''}</div>
+        </div>
+        <span class="badge ${cls}">${lbl}</span>
+        <span class="list-card-chevron">›</span>
+      </div>`;
+  }).join('');
+}
+
+function openDetail(index) {
+  const a = appointments[index];
+  const [cls, lbl] = statusMap[a.status] || ['badge-gray', a.status];
+  const dateFull = a.slot_date
+    ? new Date(a.slot_date + 'T00:00').toLocaleDateString('pt-BR', { weekday:'long', day:'2-digit', month:'long' })
+    : '—';
+  const timeStr = a.start_time ? a.start_time.slice(0,5) : '—';
+  const canCancel = a.status === 'confirmed' || a.status === 'pending';
+  const icon = a.status === 'cancelled' ? '🚫' : a.status === 'completed' ? '✅' : '🗓';
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="detail-hero">
+      <div class="detail-hero-icon">${icon}</div>
+      <div class="detail-hero-date">${dateFull}</div>
+      <div class="detail-hero-time">${timeStr}</div>
+      <div style="margin-top:10px"><span class="badge ${cls}">${lbl}</span></div>
+    </div>
+    <div class="detail-card">
+      <div class="detail-row"><span>Serviço</span><span>${a.service_name || '—'}</span></div>
+      <div class="detail-row"><span>Profissional</span><span>${a.employee_name || '—'}</span></div>
+      ${a.service_price != null ? `<div class="detail-row"><span>Valor</span><span>R$ ${parseFloat(a.service_price).toFixed(2)}</span></div>` : ''}
+      <div class="detail-row"><span>Observações</span><span>${a.notes || '—'}</span></div>
+    </div>
+    ${canCancel ? `<button class="btn btn-danger" onclick="cancelFromDetail('${a.id}')">Cancelar agendamento</button>` : ''}
+    <button class="btn" style="margin-top:10px" onclick="showView('list')">← Voltar para a lista</button>
+  `;
+  showView('detail');
+}
+
+async function cancelFromDetail(id) {
+  if (!confirm('Tem certeza que deseja cancelar este agendamento?')) return;
+  await api('PATCH', `/appointments/${id}/cancel`);
+  toast('Agendamento cancelado.');
+  showView('list');
+  lookupAppointments();
+}
+
+/* preenche telefone se vier na URL (?phone=) */
+(() => {
+  const params = new URLSearchParams(window.location.search);
+  const phone = params.get('phone');
+  if (phone) {
+    document.getElementById('lookup-phone').value = phone;
+    lookupAppointments();
+  }
+})();
+</script>
+</body>
+</html>

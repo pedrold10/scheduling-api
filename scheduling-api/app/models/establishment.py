@@ -17,3 +17,4 @@ class Establishment(Base):
 
     employees: Mapped[list["Employee"]] = relationship(back_populates="establishment", cascade="all, delete-orphan")
     services: Mapped[list["Service"]] = relationship(back_populates="establishment", cascade="all, delete-orphan")
+    owners: Mapped[list["User"]] = relationship(secondary="user_establishments", back_populates="establishments")

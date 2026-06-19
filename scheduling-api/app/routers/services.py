@@ -1,15 +1,24 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.database import get_db
 from app.models.service import Service
 from app.schemas.service import ServiceCreate, ServiceOut
+from app.services.auth import get_current_user
 
 router = APIRouter(prefix="/services", tags=["services"])
 
 
-@router.post("/", response_model=ServiceOut, status_code=201)
-async def create_service(data: ServiceCreate, db: AsyncSession = Depends(get_db)):
+def _owner_est_ids(user):
+    return [e.id for e in user.establishments]
+
+
+@router.post("", response_model=ServiceOut, status_code=201)
+@router.post("/", response_model=ServiceOut, status_code=201, include_in_schema=False)
+async def create_service(request: Request, data: ServiceCreate, db: AsyncSession = Depends(get_db)):
+    current = await get_current_user(request, db)
+    if current.role == "owner" and data.establishment_id not in _owner_est_ids(current):
+        raise HTTPException(403, "Estabelecimento não pertence a você.")
     service = Service(**data.model_dump())
     db.add(service)
     await db.commit()
@@ -17,9 +26,14 @@ async def create_service(data: ServiceCreate, db: AsyncSession = Depends(get_db)
     return service
 
 
-@router.get("/", response_model=list[ServiceOut])
-async def list_services(establishment_id: str | None = None, db: AsyncSession = Depends(get_db)):
+@router.get("", response_model=list[ServiceOut])
+@router.get("/", response_model=list[ServiceOut], include_in_schema=False)
+async def list_services(request: Request, establishment_id: str | None = None, db: AsyncSession = Depends(get_db)):
+    current = await get_current_user(request, db)
     q = select(Service).where(Service.active.is_(True))
+    if current.role == "owner":
+        allowed = _owner_est_ids(current)
+        q = q.where(Service.establishment_id.in_(allowed))
     if establishment_id:
         q = q.where(Service.establishment_id == establishment_id)
     result = await db.execute(q.order_by(Service.name))

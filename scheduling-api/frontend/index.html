@@ -15,7 +15,6 @@
     --accent: #1a1916; --accent-fg: #f5f4f0;
     --green: #2d6a4f; --green-bg: #e8f5ee;
     --red: #9b2335; --red-bg: #fbeaec;
-    --amber: #8a5a00; --amber-bg: #fef3dc;
     --radius: 14px; --radius-sm: 8px;
     --font: 'DM Sans', sans-serif; --mono: 'DM Mono', monospace;
   }
@@ -23,29 +22,19 @@
 
   .app { max-width: 480px; margin: 0 auto; padding: 0 0 60px; }
 
-  /* ── header ── */
+  /* header */
   .header { padding: 24px 20px 0; position: sticky; top: 0; z-index: 10; background: var(--bg); }
   .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
   .logo { font-size: 20px; font-weight: 500; letter-spacing: -.4px; }
   .logo span { color: var(--text3); font-weight: 300; }
-
-  /* ── top tabs ── */
-  .tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 0; }
-  .tab-btn {
-    flex: 1; padding: 10px 8px; border: none; background: none;
-    font: inherit; font-size: 13px; font-weight: 500; color: var(--text3);
-    cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  .my-appts-link {
+    font-size: 12px; color: var(--text2); text-decoration: none; font-family: var(--mono);
+    padding: 6px 12px; border: 1px solid var(--border); border-radius: 99px;
     transition: all .15s; white-space: nowrap;
   }
-  .tab-btn.active { color: var(--text); border-bottom-color: var(--accent); }
-  .tab-btn:hover:not(.active) { color: var(--text2); }
+  .my-appts-link:hover { color: var(--text); border-color: var(--border2); background: var(--surface); }
 
-  /* ── views ── */
-  .view { display: none; animation: up .2s ease; }
-  .view.active { display: block; }
-  @keyframes up { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-
-  /* ── steps ── */
+  /* steps */
   .steps-wrap { padding: 16px 20px 0; }
   .steps { display: flex; align-items: center; margin-bottom: 4px; }
   .step-item { display: flex; align-items: center; gap: 6px; }
@@ -61,18 +50,16 @@
   .step-label.active { color: var(--text); font-weight: 500; }
   .step-sep { flex: 1; height: 1px; background: var(--border); margin: 0 6px; min-width: 10px; }
 
-  /* ── step sections ── */
+  /* step sections */
   .step-section { display: none; padding: 12px 20px 0; animation: up .2s ease; }
   .step-section.active { display: block; }
+  @keyframes up { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
   .section-title { font-size: 13px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 12px; }
 
-  /* ── card ── */
+  /* card */
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 10px; }
-  .card-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .card-value { font-size: 15px; font-weight: 500; }
-  .card-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
 
-  /* ── form ── */
+  /* form */
   .form-group { margin-bottom: 14px; }
   .form-group label { display: block; font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 5px; letter-spacing: .2px; }
   .form-group input,
@@ -90,7 +77,7 @@
   .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); }
   .form-group textarea { resize: vertical; min-height: 72px; }
 
-  /* ── slots ── */
+  /* slots */
   .date-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
   .date-nav-label { font-size: 14px; font-weight: 500; text-align: center; }
   .slots-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 4px; }
@@ -102,29 +89,20 @@
   .slot-btn:hover  { border-color: var(--accent); color: var(--accent); }
   .slot-btn.chosen { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
 
-  /* ── summary chips ── */
+  /* summary chips */
   .summary-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
   .chip { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 4px 10px; border-radius: 99px; background: var(--surface); border: 1px solid var(--border); color: var(--text2); }
   .chip strong { color: var(--text); font-weight: 500; }
 
-  /* ── badge ── */
-  .badge { display: inline-flex; align-items: center; font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 99px; }
-  .badge-green  { background: var(--green-bg);  color: var(--green); }
-  .badge-red    { background: var(--red-bg);    color: var(--red); }
-  .badge-amber  { background: var(--amber-bg);  color: var(--amber); }
-  .badge-gray   { background: var(--surface2);  color: var(--text2); }
-
-  /* ── buttons ── */
+  /* buttons */
   .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 11px 18px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); font: inherit; font-size: 14px; font-weight: 500; color: var(--text); cursor: pointer; transition: all .15s; }
   .btn:hover { border-color: var(--border2); background: var(--surface2); }
   .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); width: 100%; }
   .btn-primary:hover { opacity: .85; }
   .btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 6px; }
   .btn-outline { border-color: var(--border2); }
-  .btn-danger { border-color: var(--red); color: var(--red); }
-  .btn-danger:hover { background: var(--red-bg); }
 
-  /* ── success ── */
+  /* success */
   .success-screen { text-align: center; padding: 40px 20px; }
   .success-icon { font-size: 48px; margin-bottom: 16px; }
   .success-title { font-size: 20px; font-weight: 500; margin-bottom: 8px; }
@@ -134,14 +112,7 @@
   .detail-row:last-child { border: none; }
   .detail-row span:first-child { color: var(--text2); }
 
-  /* ── meus agendamentos ── */
-  .lookup-wrap { padding: 20px 20px 0; }
-  .lookup-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 16px; }
-  .lookup-row { display: flex; gap: 8px; align-items: flex-end; }
-  .lookup-row .form-group { flex: 1; margin-bottom: 0; }
-  .my-appt-list { padding: 0 20px; }
-
-  /* ── misc ── */
+  /* misc */
   .empty { text-align: center; padding: 36px 20px; color: var(--text3); font-size: 14px; }
   .empty-icon { font-size: 28px; margin-bottom: 8px; }
   .spinner { width: 20px; height: 20px; border: 2px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; margin: 32px auto; }
@@ -149,7 +120,6 @@
   .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--accent-fg); padding: 10px 18px; border-radius: 99px; font-size: 13px; font-weight: 500; z-index: 999; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .2s; }
   .toast.show { opacity: 1; }
   .toast.error { background: var(--red); }
-  .divider { height: 1px; background: var(--border); margin: 16px 0; }
 </style>
 </head>
 <body>
@@ -158,18 +128,8 @@
   <header class="header">
     <div class="header-top">
       <div class="logo">agenda<span>.app</span></div>
+      <a href="meus-agendamentos.html" class="my-appts-link">meus agendamentos</a>
     </div>
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('agendar', this)">Agendar</button>
-      <button class="tab-btn" onclick="switchTab('meus', this)">Meus agendamentos</button>
-    </div>
-  </header>
-
-  <!-- ══════════════════════════════════════
-       VIEW: AGENDAR
-  ══════════════════════════════════════ -->
-  <div class="view active" id="view-agendar">
-
     <div class="steps-wrap">
       <div class="steps">
         <div class="step-item">
@@ -193,116 +153,88 @@
         </div>
       </div>
     </div>
+  </header>
 
-    <!-- step 1 -->
-    <section class="step-section active" id="step-1">
-      <p class="section-title">Onde e o quê</p>
-      <div class="card">
-        <div class="form-group">
-          <label>Estabelecimento</label>
-          <select id="ag-establishment" onchange="onEstablishmentChange()">
-            <option value="">Selecione...</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Serviço</label>
-          <select id="ag-service" disabled onchange="onServiceChange()">
-            <option value="">Selecione...</option>
-          </select>
-        </div>
-        <div class="form-group" style="margin-bottom:0">
-          <label>Profissional</label>
-          <select id="ag-employee" disabled>
-            <option value="">Selecione...</option>
-          </select>
-        </div>
+  <!-- step 1 -->
+  <section class="step-section active" id="step-1">
+    <p class="section-title">Onde e o quê</p>
+    <div class="card">
+      <div class="form-group">
+        <label>Estabelecimento</label>
+        <select id="ag-establishment" onchange="onEstablishmentChange()">
+          <option value="">Selecione...</option>
+        </select>
       </div>
-      <button class="btn btn-primary" onclick="goStep2()">Escolher horário →</button>
-    </section>
-
-    <!-- step 2 -->
-    <section class="step-section" id="step-2">
-      <div class="summary-bar" id="summary-1"></div>
-      <div class="date-nav">
-        <button class="btn btn-sm" onclick="changeDay(-1)">← anterior</button>
-        <span class="date-nav-label" id="slots-date-label"></span>
-        <button class="btn btn-sm" onclick="changeDay(1)">próximo →</button>
+      <div class="form-group">
+        <label>Serviço</label>
+        <select id="ag-service" disabled onchange="onServiceChange()">
+          <option value="">Selecione...</option>
+        </select>
       </div>
-      <div id="slots-container"></div>
-      <div style="margin-top:12px;display:flex;gap:8px">
-        <button class="btn btn-sm btn-outline" onclick="goStep(1)" style="flex:1">← voltar</button>
-        <button class="btn btn-sm btn-primary" onclick="goStep3()" style="flex:2">Continuar →</button>
-      </div>
-    </section>
-
-    <!-- step 3 -->
-    <section class="step-section" id="step-3">
-      <div class="summary-bar" id="summary-2"></div>
-      <p class="section-title">Seus dados</p>
-      <div class="card">
-        <div class="form-group">
-          <label>Nome completo</label>
-          <input type="text" id="cl-name" placeholder="Como você se chama?">
-        </div>
-        <div class="form-group">
-          <label>Telefone</label>
-          <input type="tel" id="cl-phone" placeholder="(83) 99999-9999">
-        </div>
-        <div class="form-group">
-          <label>E-mail (opcional)</label>
-          <input type="email" id="cl-email" placeholder="para receber confirmação">
-        </div>
-        <div class="form-group" style="margin-bottom:0">
-          <label>Observações (opcional)</label>
-          <textarea id="ag-notes" placeholder="Ex: cabelo curto, alergia a produto..."></textarea>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:4px">
-        <button class="btn btn-sm btn-outline" onclick="goStep(2)" style="flex:1">← voltar</button>
-        <button class="btn btn-sm btn-primary" onclick="confirmBooking()" style="flex:2">Confirmar agendamento</button>
-      </div>
-    </section>
-
-    <!-- step 4: sucesso -->
-    <section class="step-section" id="step-4">
-      <div class="success-screen">
-        <div class="success-icon">✅</div>
-        <div class="success-title">Agendamento confirmado!</div>
-        <div class="success-sub">Te esperamos no horário abaixo.</div>
-        <div class="success-detail" id="success-detail"></div>
-        <button class="btn btn-primary" onclick="resetFlow()" style="margin-bottom:10px">Fazer novo agendamento</button>
-        <button class="btn" style="width:100%" onclick="switchTab('meus', document.querySelectorAll('.tab-btn')[1])">Ver meus agendamentos</button>
-      </div>
-    </section>
-
-  </div><!-- /view-agendar -->
-
-
-  <!-- ══════════════════════════════════════
-       VIEW: MEUS AGENDAMENTOS
-  ══════════════════════════════════════ -->
-  <div class="view" id="view-meus">
-
-    <div class="lookup-wrap">
-      <div class="lookup-box">
-        <p class="section-title" style="margin-bottom:10px">Buscar pelo telefone</p>
-        <div class="lookup-row">
-          <div class="form-group">
-            <input type="tel" id="lookup-phone" placeholder="(83) 99999-9999" onkeydown="if(event.key==='Enter') lookupAppointments()">
-          </div>
-          <button class="btn btn-primary" style="width:auto;flex-shrink:0;margin-bottom:0" onclick="lookupAppointments()">Buscar</button>
-        </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label>Profissional</label>
+        <select id="ag-employee" disabled>
+          <option value="">Selecione...</option>
+        </select>
       </div>
     </div>
+    <button class="btn btn-primary" onclick="goStep2()">Escolher horário →</button>
+  </section>
 
-    <div class="my-appt-list" id="my-appt-list">
-      <div class="empty">
-        <div class="empty-icon">🔍</div>
-        Digite seu telefone para ver os agendamentos.
+  <!-- step 2 -->
+  <section class="step-section" id="step-2">
+    <div class="summary-bar" id="summary-1"></div>
+    <div class="date-nav">
+      <button class="btn btn-sm" onclick="changeDay(-1)">← anterior</button>
+      <span class="date-nav-label" id="slots-date-label"></span>
+      <button class="btn btn-sm" onclick="changeDay(1)">próximo →</button>
+    </div>
+    <div id="slots-container"></div>
+    <div style="margin-top:12px;display:flex;gap:8px">
+      <button class="btn btn-sm btn-outline" onclick="goStep(1)" style="flex:1">← voltar</button>
+      <button class="btn btn-sm btn-primary" onclick="goStep3()" style="flex:2">Continuar →</button>
+    </div>
+  </section>
+
+  <!-- step 3 -->
+  <section class="step-section" id="step-3">
+    <div class="summary-bar" id="summary-2"></div>
+    <p class="section-title">Seus dados</p>
+    <div class="card">
+      <div class="form-group">
+        <label>Nome completo</label>
+        <input type="text" id="cl-name" placeholder="Como você se chama?">
+      </div>
+      <div class="form-group">
+        <label>Telefone</label>
+        <input type="tel" id="cl-phone" placeholder="(83) 99999-9999">
+      </div>
+      <div class="form-group">
+        <label>E-mail (opcional)</label>
+        <input type="email" id="cl-email" placeholder="para receber confirmação">
+      </div>
+      <div class="form-group" style="margin-bottom:0">
+        <label>Observações (opcional)</label>
+        <textarea id="ag-notes" placeholder="Ex: cabelo curto, alergia a produto..."></textarea>
       </div>
     </div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn btn-sm btn-outline" onclick="goStep(2)" style="flex:1">← voltar</button>
+      <button class="btn btn-sm btn-primary" onclick="confirmBooking()" style="flex:2">Confirmar agendamento</button>
+    </div>
+  </section>
 
-  </div><!-- /view-meus -->
+  <!-- step 4: sucesso -->
+  <section class="step-section" id="step-4">
+    <div class="success-screen">
+      <div class="success-icon">✅</div>
+      <div class="success-title">Agendamento confirmado!</div>
+      <div class="success-sub">Te esperamos no horário abaixo.</div>
+      <div class="success-detail" id="success-detail"></div>
+      <button class="btn btn-primary" onclick="resetFlow()" style="margin-bottom:10px">Fazer novo agendamento</button>
+      <a class="btn" style="width:100%;display:block;text-decoration:none;box-sizing:border-box" id="see-appts-link" href="#">Ver meus agendamentos</a>
+    </div>
+  </section>
 
 </div>
 
@@ -311,9 +243,7 @@
 <script>
 const API = 'http://localhost:8000';
 let state = { estId:null, estName:'', svcId:null, svcName:'', svcDuration:0, svcPrice:0, empId:null, empName:'', slotId:null, slotDate:new Date(), slotTime:'' };
-let lastPhone = '';
 
-/* ── helpers ── */
 async function api(method, path, body) {
   try {
     const r = await fetch(API + path, { method, headers:{'Content-Type':'application/json'}, body: body ? JSON.stringify(body) : undefined });
@@ -328,16 +258,6 @@ function toast(msg, err=false) {
   setTimeout(() => t.className='toast', 2800);
 }
 
-/* ── tabs ── */
-function switchTab(name, btn) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('view-' + name).classList.add('active');
-  btn.classList.add('active');
-  if (name === 'meus' && lastPhone) lookupAppointments();
-}
-
-/* ── booking steps ── */
 function goStep(n) {
   document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
   document.getElementById('step-' + n).classList.add('active');
@@ -362,8 +282,8 @@ async function onEstablishmentChange() {
   svcSel.disabled = !state.estId; empSel.disabled = true;
   if (!state.estId) return;
   const [emps, svcs] = await Promise.all([
-    api('GET', `/employees/?establishment_id=${state.estId}`).catch(()=>[]),
-    api('GET', `/services/?establishment_id=${state.estId}`).catch(()=>[]),
+    api('GET', `/employees?establishment_id=${state.estId}`).catch(()=>[]),
+    api('GET', `/services?establishment_id=${state.estId}`).catch(()=>[]),
   ]);
   (svcs||[]).filter(s=>s.active).forEach(s => svcSel.appendChild(new Option(s.name, s.id)));
   svcSel._data = svcs || [];
@@ -414,7 +334,7 @@ async function loadSlots() {
   container.innerHTML = '<div class="spinner"></div>';
   const dateStr = state.slotDate.toISOString().slice(0,10);
   label.textContent = state.slotDate.toLocaleDateString('pt-BR',{weekday:'long',day:'2-digit',month:'short'});
-  const slots = await api('GET', `/availability/?employee_id=${state.empId}&from_date=${dateStr}&to_date=${dateStr}`).catch(()=>[]);
+  const slots = await api('GET', `/availability?employee_id=${state.empId}&from_date=${dateStr}&to_date=${dateStr}`).catch(()=>[]);
   if (!slots || slots.length === 0) {
     container.innerHTML = '<div class="empty"><div class="empty-icon">📅</div>Sem horários disponíveis neste dia.</div>';
     return;
@@ -441,11 +361,13 @@ async function confirmBooking() {
   const notes = document.getElementById('ag-notes').value.trim();
   if (!name || !phone) return toast('Nome e telefone são obrigatórios.', true);
   let client;
-  try { client = await api('POST', '/clients/', { name, phone, email: email||null }); }
-  catch { const all = await api('GET', '/clients/').catch(()=>[]); client = (all||[]).find(c=>c.phone===phone); if (!client) return; }
-  const appt = await api('POST', '/appointments/', { slot_id: state.slotId, client_id: client.id, service_id: state.svcId, notes: notes||null });
+  try { client = await api('POST', '/clients', { name, phone, email: email||null }); }
+  catch {
+    const found = await api('GET', `/clients?phone=${encodeURIComponent(phone)}`).catch(()=>[]);
+    client = (found||[])[0]; if (!client) return;
+  }
+  const appt = await api('POST', '/appointments', { slot_id: state.slotId, client_id: client.id, service_id: state.svcId, notes: notes||null });
   if (!appt) return;
-  lastPhone = phone;
   document.getElementById('success-detail').innerHTML = [
     ['Local', state.estName], ['Serviço', state.svcName],
     ['Profissional', state.empName],
@@ -453,6 +375,7 @@ async function confirmBooking() {
     ['Horário', state.slotTime],
     ['Valor', `R$ ${parseFloat(state.svcPrice).toFixed(2)}`],
   ].map(([k,v]) => `<div class="detail-row"><span>${k}</span><span>${v}</span></div>`).join('');
+  document.getElementById('see-appts-link').href = `meus-agendamentos.html?phone=${encodeURIComponent(phone)}`;
   goStep(4);
 }
 
@@ -463,70 +386,9 @@ function resetFlow() {
   goStep(1);
 }
 
-/* ── meus agendamentos ── */
-async function lookupAppointments() {
-  const phone = document.getElementById('lookup-phone').value.trim();
-  if (!phone) return toast('Digite seu telefone.', true);
-  lastPhone = phone;
-
-  const el = document.getElementById('my-appt-list');
-  el.innerHTML = '<div class="spinner"></div>';
-
-  // busca o cliente pelo telefone
-  const clients = await api('GET', `/clients/?phone=${encodeURIComponent(phone)}`).catch(()=>[]);
-  const client = (clients||[]).find(c => c.phone === phone);
-
-  if (!client) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div>Nenhum cadastro encontrado para este telefone.</div>';
-    return;
-  }
-
-  const data = await api('GET', `/appointments/?client_id=${client.id}`).catch(()=>[]);
-
-  if (!data || data.length === 0) {
-    el.innerHTML = '<div class="empty"><div class="empty-icon">🗓</div>Nenhum agendamento encontrado.</div>';
-    return;
-  }
-
-  const statusMap = {
-    confirmed: ['badge-green', 'Confirmado'],
-    pending:   ['badge-amber', 'Pendente'],
-    cancelled: ['badge-red',   'Cancelado'],
-    completed: ['badge-gray',  'Concluído'],
-  };
-
-  el.innerHTML = `<p style="font-size:13px;color:var(--text3);margin-bottom:10px">Olá, <strong style="color:var(--text)">${client.name}</strong> — ${data.length} agendamento(s)</p>` +
-    data.map(a => {
-      const [cls, lbl] = statusMap[a.status] || ['badge-gray', a.status];
-      const dateStr = a.slot_date
-        ? new Date(a.slot_date + 'T00:00').toLocaleDateString('pt-BR', { weekday:'short', day:'2-digit', month:'short' })
-        : '—';
-      const timeStr = a.start_time ? a.start_time.slice(0,5) : '';
-      const canCancel = a.status === 'confirmed' || a.status === 'pending';
-      return `
-        <div class="card">
-          <div class="card-row" style="margin-bottom:${canCancel?'10':'0'}px">
-            <div>
-              <div class="card-value">${dateStr}${timeStr ? ' · ' + timeStr : ''}</div>
-              <div class="card-sub">${a.status === 'cancelled' ? 'Cancelado' : ''}</div>
-            </div>
-            <span class="badge ${cls}">${lbl}</span>
-          </div>
-          ${canCancel ? `<button class="btn btn-sm btn-danger" onclick="clientCancel('${a.id}')">Cancelar agendamento</button>` : ''}
-        </div>`;
-    }).join('');
-}
-
-async function clientCancel(id) {
-  if (!confirm('Tem certeza que deseja cancelar este agendamento?')) return;
-  await api('PATCH', `/appointments/${id}/cancel`);
-  toast('Agendamento cancelado.');
-  lookupAppointments();
-}
-
-/* ── init ── */
+/* init */
 (async () => {
-  const data = await api('GET', '/establishments/').catch(()=>[]);
+  const data = await api('GET', '/establishments').catch(()=>[]);
   const sel = document.getElementById('ag-establishment');
   (data||[]).forEach(e => sel.appendChild(new Option(e.name, e.id)));
 })();

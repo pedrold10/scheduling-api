@@ -23,5 +23,9 @@ class AppointmentOut(BaseModel):
     # campos desnormalizados para conveniência do frontend
     slot_date: date | None = None
     start_time: time | None = None
+    client_name: str | None = None
+    employee_name: str | None = None
+    service_name: str | None = None
+    service_price: float | None = None
 
     model_config = {"from_attributes": True}

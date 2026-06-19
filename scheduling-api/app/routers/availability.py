@@ -9,28 +9,19 @@ from app.services.slot_generator import generate_slots_for_employee
 
 router = APIRouter(prefix="/availability", tags=["availability"])
 
-DEFAULT_LOOKAHEAD_DAYS = 30
 
-
-@router.get("/", response_model=list[AvailableSlotOut])
+@router.get("", response_model=list[AvailableSlotOut])
+@router.get("/", response_model=list[AvailableSlotOut], include_in_schema=False)
 async def get_availability(
-    employee_id: str = Query(..., description="ID do funcionário"),
+    employee_id: str = Query(...),
     from_date: date = Query(default=None),
     to_date: date = Query(default=None),
     db: AsyncSession = Depends(get_db),
 ):
-    """
-    Retorna slots disponíveis para um funcionário.
-
-    Gera os slots on-demand se ainda não existirem para o período.
-    """
     today = date.today()
     from_date = from_date or today
-    to_date = to_date or (today + timedelta(days=DEFAULT_LOOKAHEAD_DAYS))
-
-    # Gera slots para o período solicitado (idempotente)
+    to_date = to_date or (today + timedelta(days=30))
     await generate_slots_for_employee(db, employee_id, from_date, to_date)
-
     result = await db.execute(
         select(AvailableSlot)
         .where(

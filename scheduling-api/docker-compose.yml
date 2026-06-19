@@ -16,6 +16,9 @@ services:
       - "8000:8000"
     environment:
       DATABASE_URL: postgresql+asyncpg://scheduling:scheduling@db:5432/scheduling_db
+      JWT_SECRET_KEY: TROQUE_ESTA_CHAVE_EM_PRODUCAO
+      SUPERADMIN_EMAIL: admin@agenda.app
+      SUPERADMIN_PASSWORD: admin123
     depends_on:
       - db
     volumes:

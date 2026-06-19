@@ -8,7 +8,8 @@ from app.schemas.client import ClientCreate, ClientOut
 router = APIRouter(prefix="/clients", tags=["clients"])
 
 
-@router.post("/", response_model=ClientOut, status_code=201)
+@router.post("", response_model=ClientOut, status_code=201)
+@router.post("/", response_model=ClientOut, status_code=201, include_in_schema=False)
 async def create_client(data: ClientCreate, db: AsyncSession = Depends(get_db)):
     existing = await db.execute(select(Client).where(Client.phone == data.phone))
     if existing.scalar_one_or_none():
@@ -20,9 +21,10 @@ async def create_client(data: ClientCreate, db: AsyncSession = Depends(get_db)):
     return client
 
 
-@router.get("/", response_model=list[ClientOut])
+@router.get("", response_model=list[ClientOut])
+@router.get("/", response_model=list[ClientOut], include_in_schema=False)
 async def list_clients(
-    phone: str | None = Query(default=None, description="Filtrar por telefone"),
+    phone: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
 ):
     q = select(Client)

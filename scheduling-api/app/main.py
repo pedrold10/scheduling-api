@@ -1,32 +1,51 @@
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.database import engine, Base
+from sqlalchemy import select
+from app.database import engine, Base, AsyncSessionLocal
 import app.models  # noqa: F401
 
 from app.routers import (
-    establishments,
-    employees,
-    services,
-    schedule_rules,
-    availability,
-    clients,
-    appointments,
+    auth, users,
+    establishments, employees, services,
+    schedule_rules, availability, clients, appointments,
 )
+from app.models.user import User
+from app.services.auth import hash_password
+
+
+async def _ensure_superadmin():
+    """Cria o superadmin padrão se não existir nenhum."""
+    email    = os.getenv("SUPERADMIN_EMAIL", "admin@agenda.app")
+    password = os.getenv("SUPERADMIN_PASSWORD", "admin123")
+    async with AsyncSessionLocal() as db:
+        result = await db.execute(select(User).where(User.email == email))
+        if not result.scalar_one_or_none():
+            db.add(User(
+                name="Superadmin",
+                email=email,
+                hashed_password=hash_password(password),
+                role="superadmin",
+            ))
+            await db.commit()
+            print(f"[startup] Superadmin criado: {email}")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    await _ensure_superadmin()
     yield
 
 
 app = FastAPI(
     title="Scheduling API",
     description="MVP de agendamentos para espaços de estética",
-    version="0.1.0",
+    version="0.2.0",
     lifespan=lifespan,
+    redirect_slashes=False,
 )
 
 app.add_middleware(
@@ -34,8 +53,11 @@ app.add_middleware(
     allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
+    allow_credentials=True,   # necessário para cookies
 )
 
+app.include_router(auth.router)
+app.include_router(users.router)
 app.include_router(establishments.router)
 app.include_router(employees.router)
 app.include_router(services.router)
