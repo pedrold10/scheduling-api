@@ -5,7 +5,8 @@ from app.database import get_db
 from app.models.user import User
 from app.schemas.user import LoginRequest, MeOut
 from app.services.auth import (
-    verify_password, create_token, get_current_user, COOKIE_NAME
+    verify_password, create_token, get_current_user,
+    get_establishment_ids, decode_token, COOKIE_NAME
 )
 from app.config import settings
 
@@ -15,7 +16,7 @@ COOKIE_OPTS = dict(
     key=COOKIE_NAME,
     httponly=True,
     samesite="lax",
-    secure=False,   # True em produção com HTTPS
+    secure=False,
     max_age=settings.jwt_expire_minutes * 60,
 )
 
@@ -28,13 +29,14 @@ async def login(data: LoginRequest, response: Response, db: AsyncSession = Depen
         raise HTTPException(401, "E-mail ou senha incorretos.")
     if not user.active:
         raise HTTPException(403, "Conta desativada.")
+    est_ids = await get_establishment_ids(db, user.id)
     token = create_token(str(user.id), user.role)
     response.set_cookie(**COOKIE_OPTS, value=token)
     return {
-        "id": user.id,
+        "id": str(user.id),
         "name": user.name,
         "role": user.role,
-        "establishment_ids": [str(e.id) for e in user.establishments],
+        "establishment_ids": [str(e) for e in est_ids],
     }
 
 
@@ -46,7 +48,15 @@ async def logout(response: Response):
 
 @router.get("/me", response_model=MeOut)
 async def me(request: Request, db: AsyncSession = Depends(get_db)):
-    user = await get_current_user(request, db)
+    token = request.cookies.get(COOKIE_NAME)
+    if not token:
+        raise HTTPException(401, "Não autenticado.")
+    payload = decode_token(token)
+    result = await db.execute(select(User).where(User.id == payload["sub"]))
+    user = result.scalar_one_or_none()
+    if not user or not user.active:
+        raise HTTPException(401, "Usuário inativo ou não encontrado.")
+    est_ids = await get_establishment_ids(db, user.id)
     out = MeOut.model_validate(user)
-    out.establishment_ids = [e.id for e in user.establishments]
+    out.establishment_ids = est_ids
     return out

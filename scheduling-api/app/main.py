@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select
 from app.database import engine, Base, AsyncSessionLocal
-import app.models  # noqa: F401
+import app.models
 
 from app.routers import (
     auth, users,
@@ -16,7 +16,6 @@ from app.services.auth import hash_password
 
 
 async def _ensure_superadmin():
-    """Cria o superadmin padrão se não existir nenhum."""
     email    = os.getenv("SUPERADMIN_EMAIL", "admin@agenda.app")
     password = os.getenv("SUPERADMIN_PASSWORD", "admin123")
     async with AsyncSessionLocal() as db:
@@ -42,7 +41,6 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="Scheduling API",
-    description="MVP de agendamentos para espaços de estética",
     version="0.2.0",
     lifespan=lifespan,
     redirect_slashes=False,
@@ -50,10 +48,10 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000"],
     allow_methods=["*"],
     allow_headers=["*"],
-    allow_credentials=True,   # necessário para cookies
+    allow_credentials=True,
 )
 
 app.include_router(auth.router)

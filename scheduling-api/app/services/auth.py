@@ -1,23 +1,22 @@
 from datetime import datetime, timedelta, timezone
+import uuid
+import bcrypt
 from jose import jwt, JWTError
-from passlib.context import CryptContext
 from fastapi import HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from app.config import settings
-from app.models.user import User
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+from app.models.user import User, user_establishments
 
 COOKIE_NAME = "access_token"
 
 
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
 
 
 def verify_password(plain: str, hashed: str) -> bool:
-    return pwd_context.verify(plain, hashed)
+    return bcrypt.checkpw(plain.encode(), hashed.encode())
 
 
 def create_token(user_id: str, role: str) -> str:
@@ -36,6 +35,14 @@ def decode_token(token: str) -> dict:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Token inválido ou expirado.")
 
 
+async def get_establishment_ids(db: AsyncSession, user_id) -> list[uuid.UUID]:
+    result = await db.execute(
+        select(user_establishments.c.establishment_id)
+        .where(user_establishments.c.user_id == user_id)
+    )
+    return [row[0] for row in result.all()]
+
+
 async def get_current_user(request: Request, db: AsyncSession) -> User:
     token = request.cookies.get(COOKIE_NAME)
     if not token:
@@ -51,8 +58,3 @@ async def get_current_user(request: Request, db: AsyncSession) -> User:
 def require_superadmin(user: User):
     if user.role != "superadmin":
         raise HTTPException(status.HTTP_403_FORBIDDEN, "Acesso restrito ao superadmin.")
-
-
-def require_owner_or_superadmin(user: User):
-    if user.role not in ("owner", "superadmin"):
-        raise HTTPException(status.HTTP_403_FORBIDDEN, "Acesso não autorizado.")

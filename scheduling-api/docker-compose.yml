@@ -1,29 +1,43 @@
 services:
   db:
     image: postgres:16-alpine
+    restart: unless-stopped
+
     environment:
-      POSTGRES_USER: scheduling
-      POSTGRES_PASSWORD: scheduling
-      POSTGRES_DB: scheduling_db
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
     volumes:
       - pgdata:/var/lib/postgresql/data
 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   api:
     build: .
+    restart: unless-stopped
+
     ports:
       - "8000:8000"
+
     environment:
-      DATABASE_URL: postgresql+asyncpg://scheduling:scheduling@db:5432/scheduling_db
-      JWT_SECRET_KEY: TROQUE_ESTA_CHAVE_EM_PRODUCAO
-      SUPERADMIN_EMAIL: admin@agenda.app
-      SUPERADMIN_PASSWORD: admin123
+      DATABASE_URL: ${DATABASE_URL}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      SUPERADMIN_EMAIL: ${SUPERADMIN_EMAIL}
+      SUPERADMIN_PASSWORD: ${SUPERADMIN_PASSWORD}
+
     depends_on:
-      - db
-    volumes:
-      - .:/app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      db:
+        condition: service_healthy
+
+    command: >
+      uvicorn app.main:app
+      --host 0.0.0.0
+      --port 8000
 
 volumes:
   pgdata:
