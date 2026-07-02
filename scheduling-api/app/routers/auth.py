@@ -15,8 +15,8 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 COOKIE_OPTS = dict(
     key=COOKIE_NAME,
     httponly=True,
-    samesite="lax",
-    secure=False,
+    samesite="none",
+    secure=True,
     max_age=settings.jwt_expire_minutes * 60,
 )
 
