@@ -4,20 +4,27 @@ from sqlalchemy import select
 from app.database import get_db
 from app.models.service import Service
 from app.schemas.service import ServiceCreate, ServiceOut
-from app.services.auth import get_current_user
+from app.services.auth import (
+    get_current_user,
+    get_establishment_ids,
+)
 
 router = APIRouter(prefix="/services", tags=["services"])
 
 
-def _owner_est_ids(user):
-    return [e.id for e in user.establishments]
 
 
 @router.post("", response_model=ServiceOut, status_code=201)
 @router.post("/", response_model=ServiceOut, status_code=201, include_in_schema=False)
 async def create_service(request: Request, data: ServiceCreate, db: AsyncSession = Depends(get_db)):
     current = await get_current_user(request, db)
-    if current.role == "owner" and data.establishment_id not in _owner_est_ids(current):
+    if current.role == "owner":
+        allowed = await get_establishment_ids(
+            db,
+            current.id,
+        )
+
+    if data.establishment_id not in allowed:
         raise HTTPException(403, "Estabelecimento não pertence a você.")
     service = Service(**data.model_dump())
     db.add(service)
@@ -32,7 +39,10 @@ async def list_services(request: Request, establishment_id: str | None = None, d
     current = await get_current_user(request, db)
     q = select(Service).where(Service.active.is_(True))
     if current.role == "owner":
-        allowed = _owner_est_ids(current)
+        allowed = await get_establishment_ids(
+            db,
+            current.id,
+        )
         q = q.where(Service.establishment_id.in_(allowed))
     if establishment_id:
         q = q.where(Service.establishment_id == establishment_id)

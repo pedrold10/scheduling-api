@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, date, time
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 
 
 class AppointmentCreate(BaseModel):
@@ -9,6 +9,19 @@ class AppointmentCreate(BaseModel):
     service_id: uuid.UUID
     notes: str | None = None
 
+
+class PublicAppointmentCreate(BaseModel):
+    slot_id: uuid.UUID
+
+    service_id: uuid.UUID
+
+    name: str
+
+    phone: str
+
+    email: EmailStr | None = None
+
+    notes: str | None = None
 
 class AppointmentOut(BaseModel):
     id: uuid.UUID

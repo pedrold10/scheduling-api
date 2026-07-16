@@ -7,7 +7,10 @@ from app.models.appointment import Appointment
 from app.models.available_slot import AvailableSlot
 from app.models.employee import Employee
 from app.schemas.appointment import AppointmentCreate, AppointmentOut
-from app.services.auth import get_current_user
+from app.services.auth import (
+    get_current_user,
+    get_establishment_ids,
+)
 
 router = APIRouter(prefix="/appointments", tags=["appointments"])
 
@@ -80,15 +83,28 @@ async def list_appointments(
         # rota pública: cliente filtra pelos próprios
         q = q.where(Appointment.client_id == client_id)
     elif is_auth and current.role == "owner":
-        # owner vê só os agendamentos dos seus estabelecimentos
-        est_ids = [e.id for e in current.establishments]
-        emp_res = await db.execute(
-            select(Employee.id).where(Employee.establishment_id.in_(est_ids))
+
+        est_ids = await get_establishment_ids(
+            db,
+            current.id,
         )
-        emp_ids = [r[0] for r in emp_res.all()]
-        q = q.where(Appointment.employee_id.in_(emp_ids))
+
+        emp_res = await db.execute(
+            select(Employee.id).where(
+                Employee.establishment_id.in_(est_ids)
+            )
+        )
+
+        emp_ids = [row[0] for row in emp_res.all()]
+
+        q = q.where(
+            Appointment.employee_id.in_(emp_ids)
+        )
+
         if employee_id:
-            q = q.where(Appointment.employee_id == employee_id)
+            q = q.where(
+                Appointment.employee_id == employee_id
+            )
     elif employee_id:
         q = q.where(Appointment.employee_id == employee_id)
 

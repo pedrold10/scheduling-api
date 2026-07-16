@@ -4,7 +4,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select
 from app.database import engine, Base, AsyncSessionLocal
+from app.config import settings
 import app.models
+from app.routers import public
 
 from app.routers import (
     auth, users,
@@ -48,10 +50,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-                   "http://localhost:3000",
-                   "https://agendaai-two.vercel.app"
-    ],
+    allow_origins=settings.cors_origins_list,
     allow_methods=["*"],
     allow_headers=["*"],
     allow_credentials=True,
@@ -66,6 +65,7 @@ app.include_router(schedule_rules.router)
 app.include_router(availability.router)
 app.include_router(clients.router)
 app.include_router(appointments.router)
+app.include_router(public.router)
 
 
 @app.get("/health")

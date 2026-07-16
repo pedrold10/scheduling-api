@@ -4,20 +4,25 @@ from sqlalchemy import select
 from app.database import get_db
 from app.models.employee import Employee
 from app.schemas.employee import EmployeeCreate, EmployeeOut
-from app.services.auth import get_current_user
+from app.services.auth import (
+    get_current_user,
+    get_establishment_ids,
+)
 
 router = APIRouter(prefix="/employees", tags=["employees"])
-
-
-def _owner_est_ids(user):
-    return [e.id for e in user.establishments]
 
 
 @router.post("", response_model=EmployeeOut, status_code=201)
 @router.post("/", response_model=EmployeeOut, status_code=201, include_in_schema=False)
 async def create_employee(request: Request, data: EmployeeCreate, db: AsyncSession = Depends(get_db)):
     current = await get_current_user(request, db)
-    if current.role == "owner" and data.establishment_id not in _owner_est_ids(current):
+    if current.role == "owner":
+        allowed = await get_establishment_ids(
+            db,
+            current.id,
+        )
+
+    if data.establishment_id not in allowed:
         raise HTTPException(403, "Estabelecimento não pertence a você.")
     employee = Employee(**data.model_dump())
     db.add(employee)
@@ -32,7 +37,10 @@ async def list_employees(request: Request, establishment_id: str | None = None, 
     current = await get_current_user(request, db)
     q = select(Employee).where(Employee.active.is_(True))
     if current.role == "owner":
-        allowed = _owner_est_ids(current)
+        allowed = await get_establishment_ids(
+        db,
+        current.id,
+    )
         q = q.where(Employee.establishment_id.in_(allowed))
     if establishment_id:
         q = q.where(Employee.establishment_id == establishment_id)
@@ -46,7 +54,11 @@ async def get_employee(employee_id, request: Request, db: AsyncSession = Depends
     result = await db.execute(select(Employee).where(Employee.id == employee_id))
     obj = result.scalar_one_or_none()
     if not obj:
-        raise HTTPException(404, "Funcionário não encontrado.")
-    if current.role == "owner" and obj.establishment_id not in _owner_est_ids(current):
-        raise HTTPException(403, "Acesso não autorizado.")
+        allowed = await get_establishment_ids(
+            db,
+            current.id,
+        )
+
+        if obj.establishment_id not in allowed:
+            raise HTTPException(403, "Acesso não autorizado.")
     return obj
