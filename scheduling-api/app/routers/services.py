@@ -19,13 +19,18 @@ router = APIRouter(prefix="/services", tags=["services"])
 async def create_service(request: Request, data: ServiceCreate, db: AsyncSession = Depends(get_db)):
     current = await get_current_user(request, db)
     if current.role == "owner":
+
         allowed = await get_establishment_ids(
             db,
             current.id,
         )
 
-    if data.establishment_id not in allowed:
-        raise HTTPException(403, "Estabelecimento não pertence a você.")
+        if data.establishment_id not in allowed:
+
+            raise HTTPException(
+                403,
+                "Sem acesso."
+            )
     service = Service(**data.model_dump())
     db.add(service)
     await db.commit()
@@ -37,14 +42,23 @@ async def create_service(request: Request, data: ServiceCreate, db: AsyncSession
 @router.get("/", response_model=list[ServiceOut], include_in_schema=False)
 async def list_services(request: Request, establishment_id: str | None = None, db: AsyncSession = Depends(get_db)):
     current = await get_current_user(request, db)
-    q = select(Service).where(Service.active.is_(True))
+    q = select(Service)
+
     if current.role == "owner":
+
         allowed = await get_establishment_ids(
             db,
             current.id,
         )
-        q = q.where(Service.establishment_id.in_(allowed))
+
+        q = q.where(
+            Service.establishment_id.in_(allowed)
+        )
+
     if establishment_id:
-        q = q.where(Service.establishment_id == establishment_id)
+
+        q = q.where(
+            Service.establishment_id == establishment_id
+        )
     result = await db.execute(q.order_by(Service.name))
     return result.scalars().all()

@@ -16,3 +16,9 @@ class ServiceOut(ServiceCreate):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+class ServiceSimple(BaseModel):
+    id: uuid.UUID
+    name: str
+
+    model_config = {"from_attributes": True}

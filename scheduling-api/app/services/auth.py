@@ -5,6 +5,7 @@ from jose import jwt, JWTError
 from fastapi import HTTPException, Request, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from app.config import settings
 from app.models.user import User, user_establishments
 
@@ -42,18 +43,36 @@ async def get_establishment_ids(db: AsyncSession, user_id) -> list[uuid.UUID]:
     )
     return [row[0] for row in result.all()]
 
-
 async def get_current_user(request: Request, db: AsyncSession) -> User:
     token = request.cookies.get(COOKIE_NAME)
-    if not token:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Não autenticado.")
-    payload = decode_token(token)
-    result = await db.execute(select(User).where(User.id == payload["sub"]))
-    user = result.scalar_one_or_none()
-    if not user or not user.active:
-        raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Usuário inativo ou não encontrado.")
-    return user
 
+    if not token:
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED,
+            "Não autenticado."
+        )
+
+    payload = decode_token(token)
+
+    result = await db.execute(
+        select(User)
+        .options(
+            selectinload(User.establishments)
+        )
+        .where(
+            User.id == payload["sub"]
+        )
+    )
+
+    user = result.scalar_one_or_none()
+
+    if not user or not user.active:
+        raise HTTPException(
+            status.HTTP_401_UNAUTHORIZED,
+            "Usuário inativo ou não encontrado."
+        )
+
+    return user
 
 def require_superadmin(user: User):
     if user.role != "superadmin":

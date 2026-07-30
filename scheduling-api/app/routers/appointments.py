@@ -111,23 +111,52 @@ async def list_appointments(
     result = await db.execute(q)
     return [_to_out(a) for a in result.unique().scalars().all()]
 
-
 @router.patch("/{appointment_id}/cancel", response_model=AppointmentOut)
-async def cancel_appointment(appointment_id, db: AsyncSession = Depends(get_db)):
-    """Pública — cliente pode cancelar pelo ID."""
+async def cancel_appointment(
+    appointment_id,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+):
+    current = await get_current_user(request, db)
+
     result = await db.execute(
-        select(Appointment).options(*_RELATIONS).where(Appointment.id == appointment_id)
+        select(Appointment)
+        .options(*_RELATIONS)
+        .where(Appointment.id == appointment_id)
     )
+
     a = result.unique().scalar_one_or_none()
+
     if not a:
         raise HTTPException(404, "Agendamento não encontrado.")
+
+    if current.role == "owner":
+
+        allowed = await get_establishment_ids(db, current.id)
+
+        if a.employee.establishment_id not in allowed:
+            raise HTTPException(
+                403,
+                "Sem acesso."
+            )
+
     if a.status in ("cancelled", "completed"):
-        raise HTTPException(409, f"Agendamento já está {a.status}.")
+        raise HTTPException(
+            409,
+            f"Agendamento já está {a.status}."
+        )
+
     a.status = "cancelled"
+
     if a.slot:
         a.slot.status = "available"
+
     await db.commit()
+
     result = await db.execute(
-        select(Appointment).options(*_RELATIONS).where(Appointment.id == appointment_id)
+        select(Appointment)
+        .options(*_RELATIONS)
+        .where(Appointment.id == appointment_id)
     )
+
     return _to_out(result.unique().scalar_one())

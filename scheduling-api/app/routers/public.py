@@ -13,21 +13,20 @@ from app.models.service import Service
 from app.schemas.service import ServiceOut
 from datetime import date
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
 from app.models.available_slot import AvailableSlot
 from app.models.appointment import Appointment
 from app.models.client import Client
 
 from app.schemas.appointment import (
-    AppointmentCreate,
     PublicAppointmentCreate,
     AppointmentOut,
 )
-
-from sqlalchemy.orm import selectinload
+from app.services.slot_generator import generate_slots_for_employee
 
 from app.schemas.public import PublicEstablishment
+from sqlalchemy import inspect
 
 router = APIRouter(
     prefix="/public",
@@ -79,15 +78,9 @@ async def public_establishment(
         select(Establishment)
 
         .options(
-
-            selectinload(
-                Establishment.employees
-            ),
-
-            selectinload(
-                Establishment.services
-            ),
-
+            selectinload(Establishment.services),
+            selectinload(Establishment.employees)
+                .selectinload(Employee.services),
         )
 
         .where(
@@ -97,6 +90,16 @@ async def public_establishment(
     )
 
     establishment = result.scalar_one_or_none()
+
+    for emp in establishment.employees:
+        print("==========")
+        print(emp.name)
+        print(emp.services)
+
+        for s in emp.services:
+            print(s.id, s.name)
+
+    print("==========")
 
     if establishment is None:
         raise HTTPException(
@@ -144,6 +147,7 @@ async def public_employees(
 
     result = await db.execute(
         select(Employee)
+        .options(selectinload(Employee.services))
         .where(
             Employee.establishment_id == establishment.id,
             Employee.active.is_(True),
@@ -181,36 +185,33 @@ async def public_services(
 
     return result.scalars().all()
 
-@router.get(
-    "/{slug}/slots",
-)
+@router.get("/{slug}/slots")
 async def public_slots(
     slug: str,
     employee_id: str,
     day: date,
     db: AsyncSession = Depends(get_db),
 ):
-    establishment = await get_establishment_by_slug(
-        slug,
-        db,
-    )
+    establishment = await get_establishment_by_slug(slug, db)
 
-    employee = await db.get(
-        Employee,
-        employee_id,
-    )
+    employee = await db.get(Employee, employee_id)
 
     if employee is None:
-        raise HTTPException(
-            404,
-            "Funcionário não encontrado.",
-        )
+        raise HTTPException(404, "Funcionário não encontrado.")
 
     if employee.establishment_id != establishment.id:
         raise HTTPException(
             403,
             "Funcionário não pertence ao estabelecimento.",
         )
+
+    # GERA OS SLOTS CASO AINDA NÃO EXISTAM
+    await generate_slots_for_employee(
+        db=db,
+        employee_id=employee.id,
+        from_date=day,
+        to_date=day,
+    )
 
     result = await db.execute(
         select(AvailableSlot)
@@ -241,10 +242,6 @@ async def public_create_appointment(
 
     result = await db.execute(
         select(AvailableSlot)
-        .options(
-            joinedload(AvailableSlot.employee)
-            .joinedload(Employee.services)
-        )
         .where(
             AvailableSlot.id == data.slot_id
         )
@@ -259,13 +256,25 @@ async def public_create_appointment(
             "Horário não encontrado.",
         )
 
+    result = await db.execute(
+    select(Employee)
+    .options(
+        selectinload(Employee.services)
+    )
+    .where(
+        Employee.id == slot.employee_id
+    )
+)
+
+    employee = result.scalar_one()
+
     if slot.status != "available":
         raise HTTPException(
             409,
             "Este horário não está mais disponível.",
         )
 
-    if slot.employee.establishment_id != establishment.id:
+    if employee.establishment_id != establishment.id:
         raise HTTPException(
             403,
             "Este horário pertence a outro estabelecimento.",
@@ -293,8 +302,8 @@ async def public_create_appointment(
             400,
             "Serviço indisponível.",
         )
-
-    if service not in slot.employee.services:
+    
+    if service.id not in {s.id for s in employee.services}:
         raise HTTPException(
             400,
             "Este profissional não realiza este serviço.",
@@ -322,7 +331,7 @@ async def public_create_appointment(
     appointment = Appointment(
         slot_id=slot.id,
         client_id=client.id,
-        employee_id=slot.employee_id,
+        employee_id=employee.id,
         service_id=service.id,
         notes=data.notes,
         status="confirmed",
